@@ -1,0 +1,10 @@
+{
+  "title": "Flip 7",
+  "description": "Pioche, tente ta chance et évite le BUST : 7 numéros différents et c'est le FLIP 7 !",
+  "author": "Léo",
+  "category": "Cartes",
+  "emoji": "🃏",
+  "joueurs": "2-12",
+  "image": "cover.png",
+  "classement": "victoires"
+}

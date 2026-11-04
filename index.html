@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Flip 7 — ChadGangGames</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <section id="menu">
+    <div class="menu-card panel">
+      <div class="logo">FLIP<span>7</span></div>
+      <p class="tagline">Pioche, pioche… mais ne te fais pas <b>BUST</b> ! Sept numéros différents = <b>FLIP 7</b> 🔥</p>
+      <div id="whoami" class="hint"></div>
+      <label id="pseudoBox">Ton pseudo <input id="pseudo" maxlength="16" autocomplete="off"></label>
+      <div id="online">
+        <button class="big go" data-a="create">🎲 Créer une salle</button>
+        <div class="joinrow">
+          <input id="code" maxlength="12" placeholder="CODE" autocomplete="off" spellcheck="false">
+          <button class="big" data-a="join">Rejoindre</button>
+        </div>
+      </div>
+      <button class="big alt" data-a="solo">🤖 Jouer contre des bots</button>
+      <button class="link" data-a="rules">Règles du jeu</button>
+    </div>
+  </section>
+
+  <section id="lobby" hidden></section>
+
+  <section id="game" hidden>
+    <header id="top"></header>
+    <div id="stage">
+      <div class="deck"><div class="deckcard"><b id="deckn">94</b></div><small>Pioche</small></div>
+      <div id="last" class="last"><span class="hint">La partie va commencer…</span></div>
+      <ul id="log"></ul>
+    </div>
+    <main id="table">
+      <div id="summary"></div>
+      <div id="players"></div>
+    </main>
+    <footer id="bar"></footer>
+  </section>
+
+</div>
+
+<div id="modal" hidden></div>
+<div id="toast"></div>
+<canvas id="fx"></canvas>
+<div id="flash"></div>
+<div id="banner"></div>
+<div id="floaters"></div>
+
+<script src="/_sdk.js"></script>
+<script src="engine.js"></script>
+<script src="fx.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
