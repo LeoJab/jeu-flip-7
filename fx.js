@@ -84,7 +84,19 @@ const FX = (() => {
   }
   addEventListener('resize', size); size();
 
+  // Emojis dessinés une seule fois dans un petit canvas (beaucoup plus léger que fillText à chaque image)
+  const SPR = {};
+  function sprite(e) {
+    if (SPR[e]) return SPR[e];
+    const k = document.createElement('canvas'); k.width = k.height = 64;
+    const g = k.getContext('2d');
+    g.font = '46px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(e, 32, 34);
+    return (SPR[e] = k);
+  }
+
   function spawn(o) {
+    if (P.length > 120) return; // plafond de particules : évite de faire ramer / planter
     P.push(Object.assign({ x: 0, y: 0, vx: 0, vy: 0, g: 0.18, life: 70, max: 70, size: 7, color: '#fff', rot: 0, vr: 0, shape: 'sq', drag: 0.992, emoji: null }, o, { max: o.life || 70 }));
     if (!raf) raf = requestAnimationFrame(loop);
   }
@@ -97,7 +109,7 @@ const FX = (() => {
       if (p.life <= 0 || p.y > H + 40) { P.splice(i, 1); continue; }
       c.globalAlpha = Math.min(1, p.life / (p.max * 0.35));
       c.save(); c.translate(p.x, p.y); c.rotate(p.rot);
-      if (p.emoji) { c.font = p.size + 'px serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(p.emoji, 0, 0); }
+      if (p.emoji) c.drawImage(sprite(p.emoji), -p.size / 2, -p.size / 2, p.size, p.size);
       else {
         c.fillStyle = p.color;
         if (p.shape === 'c') { c.beginPath(); c.arc(0, 0, p.size / 2, 0, 6.283); c.fill(); }
@@ -116,7 +128,7 @@ const FX = (() => {
 
   function burst(x, y, o) {
     o = o || {};
-    const n = Math.round((o.n || 20) * RM);
+    const n = Math.round((o.emoji ? Math.min(o.n || 20, 6) : Math.min(o.n || 20, 30)) * RM);
     for (let i = 0; i < n; i++) {
       const a = r(0, 6.283), sp = r(1, o.speed || 5);
       spawn({
@@ -128,7 +140,7 @@ const FX = (() => {
   }
   function confetti(power) {
     power = power || 1;
-    const n = Math.round(70 * power * RM);
+    const n = Math.round(34 * power * RM);
     for (let i = 0; i < n; i++) {
       const left = i % 2 === 0;
       spawn({
@@ -136,12 +148,19 @@ const FX = (() => {
         life: r(90, 160), size: r(6, 12), rot: r(0, 6), vr: r(-0.4, 0.4), color: pick(COLORS), drag: 0.985
       });
     }
-    for (let i = 0; i < Math.round(50 * power * RM); i++) {
+    for (let i = 0; i < Math.round(18 * power * RM); i++) {
       spawn({ x: r(0, W), y: r(-60, -10), vx: r(-1.5, 1.5), vy: r(1, 4), g: 0.06, life: r(120, 200), size: r(6, 11), rot: r(0, 6), vr: r(-0.3, 0.3), color: pick(COLORS) });
     }
   }
+  // Petite pluie d'emojis qui tombe doucement sur tout l'écran
+  function rain(list, n) {
+    n = Math.round((n || 12) * RM);
+    for (let i = 0; i < n; i++) {
+      setTimeout(() => spawn({ x: r(20, W - 20), y: r(-50, -10), vx: r(-0.5, 0.5), vy: r(1.5, 3), g: 0.02, drag: 1, life: 170, size: r(26, 40), rot: r(-0.4, 0.4), vr: r(-0.03, 0.03), emoji: pick(list) }), i * 90);
+    }
+  }
   function snow(x, y) {
-    burst(x, y, { n: 26, speed: 6, g: 0.03, emoji: ['❄️', '❄️', '✨'] });
+    burst(x, y, { n: 6, speed: 6, g: 0.03, emoji: '❄️' });
     burst(x, y, { n: 20, speed: 4, g: 0.05, colors: ['#bfeaff', '#fff', '#7fd0ff'], round: true });
   }
   function coins(x, y) { burst(x, y, { n: 16, speed: 6, g: 0.25, emoji: '🪙' }); }
@@ -183,5 +202,5 @@ const FX = (() => {
     else setTimeout(done, 1500);
   }
 
-  return { burst, confetti, snow, coins, flash, banner, shake, float };
+  return { burst, confetti, rain, snow, coins, flash, banner, shake, float };
 })();

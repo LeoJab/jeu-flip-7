@@ -11,7 +11,7 @@
   const BOTS = [['Robo-Chad', '🤖'], ['Gégé Bot', '👾'], ['Cyber-Kevin', '🦾'], ['Mécha-Jul', '🐸'], ['Sir Bluff', '🎩'], ['Dame Risque', '🦊'], ['Pixel', '🐙'], ['Turbo', '🐲']];
   const EMOS = ['😂', '😱', '🔥', '👏', '💀', '😎'];
   const PROMPT = { F: '❄️ GEL : qui est gelé ?', T: '🔄 FLIP THREE : qui pioche 3 cartes ?', S: '🛡️ Offre ta Seconde Chance à qui ?' };
-  const STATUS = { active: 'En jeu', stayed: '✋ Reste', frozen: '❄️ Gelé', busted: '💥 BUST !', flip7: '🔥 FLIP 7 !', out: 'Absent' };
+  const STATUS = { active: 'En jeu', stayed: '✋ Reste', frozen: '🥶 Gelé', busted: '💥 BUST !', flip7: '🔥 FLIP 7 !', out: 'Absent' };
 
   let me = { id: '', name: 'Joueur', avatar: null };
   let myId = '', room = null, local = false, code = '';
@@ -436,7 +436,7 @@
     const evs = S.ev || [];
     const top = evs.length ? evs[evs.length - 1].id : 0;
     if (lastEv === null) { lastEv = top; return; }
-    evs.filter(e => e.id > lastEv).forEach(playEvent);
+    evs.filter(e => e.id > lastEv).forEach(e => { try { playEvent(e); } catch (err) { /* un effet raté ne doit jamais bloquer le jeu */ } });
     lastEv = Math.max(lastEv, top);
   }
 
@@ -460,7 +460,8 @@
         break;
       case 'bust':
         SND.bust(); FX.shake(); FX.flash('rgba(255,0,40,.55)'); FX.banner('BUST !', '#ff3b4e');
-        FX.burst(c.x, c.y, { n: 40, speed: 9, emoji: ['💥', '💀', '🔥'], g: 0.2 });
+        FX.burst(c.x, c.y, { n: 30, speed: 9, colors: ['#ff3b4e', '#ff8a2b', '#ffd426', '#12102b'], g: 0.2 });
+        FX.rain(['💀', '💥'], 8);
         FX.float('Doublon ' + e.x + ' !', c.x, c.y, '#ff3b4e');
         break;
       case 'save':
@@ -470,15 +471,16 @@
       case 'sc':
         SND.save(); FX.float('🛡️ Seconde Chance', c.x, c.y, '#2fd27a'); break;
       case 'freeze':
-        SND.freeze(); FX.flash('rgba(120,200,255,.55)'); FX.banner('GEL ❄️', '#8fe3ff'); FX.snow(c.x, c.y); break;
+        SND.freeze(); FX.flash('rgba(120,200,255,.55)'); FX.banner('GEL 🥶', '#8fe3ff'); FX.snow(c.x, c.y);
+        FX.float('🥶', c.x, c.y); FX.rain(['🥶', '❄️'], 14); break;
       case 'flip3':
-        SND.flip3(); FX.banner('FLIP THREE ×3', '#ff9f1c'); FX.burst(c.x, c.y, { n: 22, emoji: '🔄', speed: 6, g: 0 }); break;
+        SND.flip3(); FX.banner('FLIP THREE ×3', '#ff9f1c'); FX.burst(c.x, c.y, { n: 6, emoji: '🔄', speed: 6, g: 0 }); break;
       case 'stay':
         SND.stay(); FX.coins(c.x, c.y); FX.float('+' + e.x + ' pts', c.x, c.y, '#ffd426'); break;
       case 'flip7':
-        SND.flip7(); FX.banner('FLIP 7 !!!', '#ffd426', 2400); FX.flash('rgba(255,212,38,.85)'); FX.shake(); FX.confetti(2); break;
+        SND.flip7(); FX.banner('FLIP 7 !!!', '#ffd426', 2400); FX.flash('rgba(255,212,38,.85)'); FX.shake(); FX.confetti(1.6); FX.rain(['🔥', '🎉', '7️⃣'], 16); break;
       case 'win':
-        SND.win(); FX.confetti(3.5); FX.banner('🏆 ' + nm + ' GAGNE !', '#ffd426', 3000); break;
+        SND.win(); FX.confetti(2.5); FX.rain(['🏆', '🎉'], 16); FX.banner('🏆 ' + nm + ' GAGNE !', '#ffd426', 3000); break;
       case 'roundEnd': SND.tick(); break;
       case 'round': SND.tick(); FX.banner('MANCHE ' + e.x, '#fff', 1000); break;
       case 'shuffle': toast('🔀 Défausse mélangée dans la pioche'); break;
